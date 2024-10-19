@@ -55,7 +55,7 @@ const convertETHToHexGwei = (eth) => convertToHexValue(eth * 10 ** 18);
 /**
  *
  * @param {object} options
- * @param {(fixtures: Fixtures) => Promise<void>} testSuite
+ * @param {({driver: Driver, mockedEndpoint: MockedEndpoint}: TestSuiteArguments) => Promise<void>} testSuite
  */
 async function withFixtures(options, testSuite) {
   const {
@@ -1282,6 +1282,9 @@ async function openMenuSafe(driver) {
   }
 }
 
+// https://sentry.io/api/0000000/envelope/?sentry_key=fake&sentry_version=7&sentry_client=sentry.javascript.browser%2F8.33.1
+const sentryRegEx = /^https:\/\/sentry\.io\/api\/\d+\/envelope/gu;
+
 module.exports = {
   DAPP_HOST_ADDRESS,
   DAPP_URL,
@@ -1353,4 +1356,5 @@ module.exports = {
   getSelectedAccountAddress,
   tempToggleSettingRedesignedConfirmations,
   openMenuSafe,
+  sentryRegEx,
 };

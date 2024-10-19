@@ -79,7 +79,7 @@ function getClientOptions() {
   return {
     beforeBreadcrumb: beforeBreadcrumb(),
     beforeSend: (report) => rewriteReport(report),
-    debug: METAMASK_DEBUG,
+    debug: true,
     dist: isManifestV3 ? 'mv3' : 'mv2',
     dsn: sentryTarget,
     environment,
@@ -130,11 +130,11 @@ function getTracesSampleRate(sentryTarget) {
     return 0;
   }
 
-  if (METAMASK_DEBUG) {
-    return 1.0;
-  }
+  // if (METAMASK_DEBUG) {
+  //   return 1.0;
+  // }
 
-  return 0.02;
+  return 1.0;
 }
 
 /**
@@ -549,10 +549,6 @@ function getState() {
 }
 
 function integrateLogging() {
-  if (!METAMASK_DEBUG) {
-    return;
-  }
-
   for (const loggerType of ['log', 'error']) {
     logger[loggerType] = (...args) => {
       const message = args[0].replace(`Sentry Logger [${loggerType}]: `, '');
@@ -564,10 +560,6 @@ function integrateLogging() {
 }
 
 function addDebugListeners() {
-  if (!METAMASK_DEBUG) {
-    return;
-  }
-
   const client = Sentry.getClient();
 
   client?.on('beforeEnvelope', (event) => {
