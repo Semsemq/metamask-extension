@@ -4,7 +4,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
   Box,
   Button,
-  ButtonVariant,
   Icon,
   IconSize,
   Modal,
@@ -17,13 +16,21 @@ import {
   TextAlign,
   TextVariant,
 } from '../../../helpers/constants/design-system';
-import { formatEtaInMinutes, formatFiatAmount } from '../utils/quote';
-import { getBridgeQuotes } from '../../../ducks/bridge/selectors';
+import {
+  formatEtaInMinutes,
+  formatFiatAmount,
+  formatTokenAmount,
+} from '../utils/quote';
 import { useI18nContext } from '../../../hooks/useI18nContext';
 import { getCurrentCurrency } from '../../../selectors';
 import { setSortOrder } from '../../../ducks/bridge/actions';
 import { SortOrder, QuoteMetadata, QuoteResponse } from '../types';
 import { Footer } from '../../../components/multichain/pages/page';
+import { useCountdownTimer } from '../../../hooks/bridge/useCountdownTimer';
+import {
+  getBridgeQuotes,
+  getBridgeSortOrder,
+} from '../../../ducks/bridge/selectors';
 
 export const BridgeQuotesModal = ({
   onClose,
@@ -32,8 +39,13 @@ export const BridgeQuotesModal = ({
   const t = useI18nContext();
   const dispatch = useDispatch();
 
-  const { sortedQuotes } = useSelector(getBridgeQuotes);
+  const { sortedQuotes, activeQuote, recommendedQuote } =
+    useSelector(getBridgeQuotes);
+  const sortOrder = useSelector(getBridgeSortOrder);
   const currency = useSelector(getCurrentCurrency);
+  const { isLoading } = useSelector(getBridgeQuotes);
+
+  const secondsUntilNextRefresh = useCountdownTimer();
 
   const [expandedQuote, setExpandedQuote] = useState<
     (QuoteResponse & QuoteMetadata) | undefined
@@ -67,31 +79,40 @@ export const BridgeQuotesModal = ({
           </Footer>
         </ModalContent>
       ) : (
-        <ModalContent modalDialogProps={{ padding: 0 }}>
+        <ModalContent
+          className="quotes-modal__container"
+          modalDialogProps={{ padding: 0 }}
+        >
           <ModalHeader onClose={onClose}>
             <Text variant={TextVariant.headingSm} textAlign={TextAlign.Center}>
               {t('swapSelectAQuote')}
             </Text>
           </ModalHeader>
 
+          {/* HEADERS */}
           <Box className="quotes-modal__column-header">
-            <Button
-              variant={ButtonVariant.Link}
+            <span
               onClick={() =>
                 dispatch(setSortOrder(SortOrder.ADJUSTED_RETURN_DESC))
               }
+              className={
+                sortOrder === SortOrder.ADJUSTED_RETURN_DESC
+                  ? 'active-sort'
+                  : ''
+              }
             >
-              <Icon name={IconName.Arrow2Down} size={IconSize.Sm} />
+              <Icon name={IconName.ArrowDown} size={IconSize.Xs} />
               <Text>{t('bridgeOverallCost')}</Text>
-            </Button>
-            <Button
-              variant={ButtonVariant.Link}
+            </span>
+            <span
               onClick={() => dispatch(setSortOrder(SortOrder.ETA_ASC))}
+              className={sortOrder === SortOrder.ETA_ASC ? 'active-sort' : ''}
             >
-              <Icon name={IconName.Arrow2Down} size={IconSize.Sm} />
+              <Icon name={IconName.ArrowDown} size={IconSize.Xs} />
               <Text>{t('time')}</Text>
-            </Button>
+            </span>
           </Box>
+          {/* QUOTE LIST */}
           <Box className="quotes-modal__quotes">
             {sortedQuotes.map((quote, index) => {
               const {
@@ -99,35 +120,77 @@ export const BridgeQuotesModal = ({
                 sentAmount,
                 adjustedReturn,
                 estimatedProcessingTimeInSeconds,
-                quote: { bridges },
+                toTokenAmount,
+                quote: { destAsset, bridges, requestId },
               } = quote;
+              const isQuoteActive = requestId === activeQuote?.quote.requestId;
+              const isQuoteRecommended =
+                requestId === recommendedQuote?.quote.requestId;
+
               return (
                 <Box
                   key={index}
-                  className="quotes-modal__quotes__row"
+                  className={`quotes-modal__quotes__row ${
+                    isQuoteActive ? 'active-quote' : ''
+                  }`}
                   onClick={() => setExpandedQuote(quote)}
                 >
-                  <Text>{formatFiatAmount(adjustedReturn.fiat, currency)}</Text>
-                  <Text>
-                    {formatFiatAmount(totalNetworkFee?.fiat, currency)}
-                  </Text>
-                  <Text>
-                    {adjustedReturn.fiat && sentAmount.fiat
-                      ? `-${formatFiatAmount(
-                          sentAmount.fiat.minus(adjustedReturn.fiat),
-                          currency,
-                        )}`
-                      : ''}
-                  </Text>
-                  <Text>{bridges[0]}</Text>
-                  <Text>
-                    {t('bridgeTimingMinutes', [
-                      formatEtaInMinutes(estimatedProcessingTimeInSeconds),
-                    ])}
-                  </Text>
+                  {isQuoteActive && (
+                    <span className="quotes-modal__quotes__row-bar" />
+                  )}
+                  <span className="quotes-modal__quotes__row-left">
+                    {adjustedReturn.fiat && sentAmount.fiat && (
+                      <span>
+                        {isQuoteRecommended && (
+                          <Text className="description">
+                            {t(
+                              sortOrder === SortOrder.ADJUSTED_RETURN_DESC
+                                ? 'bridgeLowest'
+                                : 'bridgeFastest',
+                            )}
+                          </Text>
+                        )}
+                        <Text>
+                          {formatFiatAmount(
+                            adjustedReturn.fiat.minus(sentAmount.fiat),
+                            currency,
+                          )}
+                        </Text>
+                      </span>
+                    )}
+                    <span>
+                      <Text>
+                        {formatFiatAmount(toTokenAmount.fiat, currency) ??
+                          formatTokenAmount(
+                            toTokenAmount.raw,
+                            destAsset.symbol,
+                          )}
+                      </Text>
+                      <span>
+                        <Icon name={IconName.Gas} size={IconSize.Xs} />
+                        <Text>
+                          {formatFiatAmount(totalNetworkFee?.fiat, currency)}
+                        </Text>
+                      </span>
+                    </span>
+                  </span>
+                  <span className="quotes-modal__quotes__row-right">
+                    <Text>{bridges[0]}</Text>
+                    <Text>
+                      {t('bridgeTimingMinutes', [
+                        formatEtaInMinutes(estimatedProcessingTimeInSeconds),
+                      ])}
+                    </Text>
+                    <Icon name={IconName.ArrowRight} size={IconSize.Sm} />
+                  </span>
                 </Box>
               );
             })}
+          </Box>
+          <Box className="quotes-modal__timer">
+            {!isLoading && (
+              <Text>{t('swapNewQuoteIn', [secondsUntilNextRefresh])}</Text>
+            )}
           </Box>
         </ModalContent>
       )}
