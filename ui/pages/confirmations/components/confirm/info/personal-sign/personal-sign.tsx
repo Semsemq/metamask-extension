@@ -2,23 +2,41 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 
 import {
-  ConfirmInfoRow,
   ConfirmInfoRowAddress,
   ConfirmInfoRowText,
   ConfirmInfoRowUrl,
 } from '../../../../../../components/app/confirm/info/row';
+import { ConfirmInfoAlertRow } from '../../../../../../components/app/confirm/info/row/alert-row/alert-row';
 import { RowAlertKey } from '../../../../../../components/app/confirm/info/row/constants';
-import { useI18nContext } from '../../../../../../hooks/useI18nContext';
-import { useConfirmContext } from '../../../../context/confirm';
+import { ConfirmInfoSection } from '../../../../../../components/app/confirm/info/row/section';
+import {
+  Box,
+  Icon,
+  IconName,
+  IconSize,
+  Text,
+} from '../../../../../../components/component-library';
+import Tooltip from '../../../../../../components/ui/tooltip';
+import {
+  AlignItems,
+  BorderColor,
+  BorderRadius,
+  Display,
+  FlexDirection,
+  IconColor,
+  JustifyContent,
+  TextColor,
+  TextVariant,
+} from '../../../../../../helpers/constants/design-system';
 import {
   hexToText,
   sanitizeString,
 } from '../../../../../../helpers/utils/util';
-import { SignatureRequestType } from '../../../../types/confirm';
+import { useI18nContext } from '../../../../../../hooks/useI18nContext';
+import { useConfirmContext } from '../../../../context/confirm';
 import { selectUseTransactionSimulations } from '../../../../selectors/preferences';
+import { SignatureRequestType } from '../../../../types/confirm';
 import { isSIWESignatureRequest } from '../../../../utils';
-import { ConfirmInfoAlertRow } from '../../../../../../components/app/confirm/info/row/alert-row/alert-row';
-import { ConfirmInfoSection } from '../../../../../../components/app/confirm/info/row/section';
 import { SIWESignInfo } from './siwe-sign';
 
 const PersonalSignInfo: React.FC = () => {
@@ -43,12 +61,57 @@ const PersonalSignInfo: React.FC = () => {
     <>
       {isSIWE && useTransactionSimulations && (
         <ConfirmInfoSection>
-          <ConfirmInfoRow
-            label={t('simulationDetailsTitle')}
-            tooltip={t('simulationDetailsTitleTooltip')}
+          <Box
+            data-testid="simulation-details-layout"
+            className="simulation-details-layout"
+            display={Display.Flex}
+            flexDirection={FlexDirection.Column}
+            borderRadius={BorderRadius.LG}
+            borderColor={BorderColor.transparent}
+            padding={2}
+            gap={3}
           >
-            <ConfirmInfoRowText text={t('siweSignatureSimulationDetailInfo')} />
-          </ConfirmInfoRow>
+            <Box
+              display={Display.Flex}
+              flexDirection={FlexDirection.Row}
+              alignItems={AlignItems.center}
+              justifyContent={JustifyContent.spaceBetween}
+            >
+              <Box
+                display={Display.Flex}
+                flexDirection={FlexDirection.Row}
+                alignItems={AlignItems.center}
+                gap={1}
+              >
+                <Text variant={TextVariant.bodyMdMedium}>
+                  {t('simulationDetailsTitle')}
+                </Text>
+                <Tooltip
+                  interactive
+                  position="top"
+                  containerClassName="info-tooltip__tooltip-container"
+                  tooltipInnerClassName="info-tooltip__tooltip-content"
+                  tooltipArrowClassName="info-tooltip__top-tooltip-arrow"
+                  html={t('simulationDetailsTitleTooltip')}
+                  theme="tippy-tooltip-info"
+                  style={{ display: Display.Flex }}
+                >
+                  <Icon
+                    name={IconName.Question}
+                    marginLeft={1}
+                    color={IconColor.iconMuted}
+                    size={IconSize.Sm}
+                  />
+                </Tooltip>
+              </Box>
+              <Text
+                color={TextColor.textAlternative}
+                variant={TextVariant.bodyMd}
+              >
+                {t('simulationDetailsNoChanges')}
+              </Text>
+            </Box>
+          </Box>
         </ConfirmInfoSection>
       )}
       <ConfirmInfoSection>
