@@ -330,6 +330,15 @@ export const getQuoteRequest = (state: BridgeAppState) => {
   return quoteRequest;
 };
 
+export const getValidationWarnings = createDeepEqualSelector(
+  getBridgeQuotes,
+  ({ activeQuote }) => {
+    return {
+      isHighGasFees: !activeQuote,
+    };
+  },
+);
+
 export const getValidationErrors = createDeepEqualSelector(
   getBridgeQuotes,
   ({ activeQuote, quotesLastFetchedMs, isLoading }) => {
