@@ -3,10 +3,8 @@ import { useSelector } from 'react-redux';
 import {
   BannerAlert,
   BannerAlertSeverity,
-  Box,
-  Button,
-  ButtonVariant,
   Text,
+  PopoverPosition,
 } from '../../../components/component-library';
 import {
   getBridgeQuotes,
@@ -21,8 +19,14 @@ import {
 import { useCountdownTimer } from '../../../hooks/bridge/useCountdownTimer';
 import { getCurrentCurrency } from '../../../selectors';
 import { getNativeCurrency } from '../../../ducks/metamask/metamask';
-import { TextAlign } from '../../../helpers/constants/design-system';
-import { QuoteInfoRow } from './quote-info-row';
+import {
+  AlignItems,
+  TextAlign,
+  TextColor,
+  TextVariant,
+} from '../../../helpers/constants/design-system';
+import { Row, Column, SpacerBox, Tooltip } from '../layout';
+import { BRIDGE_MM_FEE_RATE } from '../../../../shared/constants/bridge';
 import { BridgeQuotesModal } from './bridge-quotes-modal';
 
 export const BridgeQuoteCard = () => {
@@ -39,94 +43,107 @@ export const BridgeQuoteCard = () => {
   const [showAllQuotes, setShowAllQuotes] = useState(false);
 
   return (
-    <Box className="quote-card">
+    <>
+      <BridgeQuotesModal
+        isOpen={showAllQuotes}
+        onClose={() => setShowAllQuotes(false)}
+      />
       {activeQuote ? (
-        <Box>
-          <BridgeQuotesModal
-            isOpen={showAllQuotes}
-            onClose={() => setShowAllQuotes(false)}
-          />
-          <Box className="bridge-box quote-card__timer">
+        <Column gap={3}>
+          <Row alignItems={AlignItems.flexStart}>
+            <Column textAlign={TextAlign.Left}>
+              <Row gap={1}>
+                <Text variant={TextVariant.bodyLgMedium}>{t('bestPrice')}</Text>
+                <Tooltip
+                  title={t('howQuotesWork')}
+                  position={PopoverPosition.RightEnd}
+                >
+                  {t('howQuotesWorkExplanation', [BRIDGE_MM_FEE_RATE])}
+                </Tooltip>
+              </Row>
+              <Text
+                as={'a'}
+                variant={TextVariant.bodySm}
+                color={TextColor.primaryDefault}
+                onClick={() => {
+                  setShowAllQuotes(true);
+                }}
+              >
+                {t('viewAllQuotes')}
+              </Text>
+            </Column>
             {!isLoading && (
-              <Text>{t('swapNewQuoteIn', [secondsUntilNextRefresh])}</Text>
+              <SpacerBox>
+                <Text color={TextColor.textMuted}>
+                  {secondsUntilNextRefresh}
+                </Text>
+              </SpacerBox>
             )}
-          </Box>
-
-          <Box className="bridge-box prepare-bridge-page__content quote-card__content">
-            <QuoteInfoRow
-              label={t('estimatedTime')}
-              tooltipText={t('bridgeTimingTooltipText')}
-              description={t('bridgeTimingMinutes', [
-                formatEtaInMinutes(
-                  activeQuote.estimatedProcessingTimeInSeconds,
-                ),
-              ])}
-            />
-            {activeQuote.swapRate && (
-              <QuoteInfoRow
-                label={t('quoteRate')}
-                description={`1 ${
-                  activeQuote.quote.srcAsset.symbol
-                } = ${formatTokenAmount(
-                  activeQuote.swapRate,
-                  activeQuote.quote.destAsset.symbol,
-                )}`}
-              />
-            )}
-            {activeQuote.totalNetworkFee && (
-              <QuoteInfoRow
-                label={t('totalFees')}
-                tooltipText={t('bridgeTotalFeesTooltipText')}
-                description={
-                  formatFiatAmount(
-                    activeQuote.totalNetworkFee?.fiat,
-                    currency,
-                  ) ??
-                  formatTokenAmount(activeQuote.totalNetworkFee?.raw, ticker, 6)
-                }
-                secondaryDescription={
-                  activeQuote.totalNetworkFee?.fiat
+          </Row>
+          <Column gap={1}>
+            <Row>
+              <Text color={TextColor.textAlternative}>
+                {t('crossChainSwapRate')}
+              </Text>
+              <Text>{`1 ${
+                activeQuote.quote.srcAsset.symbol
+              } = ${formatTokenAmount(
+                activeQuote.swapRate,
+                activeQuote.quote.destAsset.symbol,
+              )}`}</Text>
+            </Row>
+            <Row>
+              <Text color={TextColor.textAlternative}>{t('networkFee')}</Text>
+              <Row gap={1}>
+                <Text color={TextColor.textMuted}>
+                  {activeQuote.totalNetworkFee?.fiat
                     ? formatTokenAmount(
                         activeQuote.totalNetworkFee?.raw,
                         ticker,
                         6,
                       )
-                    : undefined
-                }
-              />
-            )}
-          </Box>
-
-          <Box className="bridge-box quote-card__footer">
-            <span>
-              <Text>{t('swapIncludesMMFee', [0.875])}</Text>
-              <Button
-                variant={ButtonVariant.Link}
-                onClick={() => {
-                  setShowAllQuotes(true);
-                }}
-              >
-                <Text>{t('viewAllQuotes')}</Text>
-              </Button>
-            </span>
-            <Button variant={ButtonVariant.Link}>
-              <Text>{t('termsOfService')}</Text>
-            </Button>
-          </Box>
-        </Box>
+                    : undefined}
+                </Text>
+                <Text>
+                  {formatFiatAmount(
+                    activeQuote.totalNetworkFee?.fiat,
+                    currency,
+                  ) ??
+                    formatTokenAmount(
+                      activeQuote.totalNetworkFee?.raw,
+                      ticker,
+                      6,
+                    )}
+                </Text>
+              </Row>
+            </Row>
+            <Row>
+              <Text color={TextColor.textAlternative}>
+                {t('estimatedTime')}
+              </Text>
+              <Text>
+                {t('bridgeTimingMinutes', [
+                  formatEtaInMinutes(
+                    activeQuote.estimatedProcessingTimeInSeconds,
+                  ),
+                ])}
+              </Text>
+            </Row>
+          </Column>
+          {isNoQuotesAvailable && (
+            <BannerAlert
+              title={t('noOptionsAvailable')}
+              severity={BannerAlertSeverity.Danger}
+              description={
+                isSrcAmountLessThan30
+                  ? t('noOptionsAvailableLessThan30Message')
+                  : t('noOptionsAvailableMessage')
+              }
+              textAlign={TextAlign.Left}
+            />
+          )}
+        </Column>
       ) : null}
-      {isNoQuotesAvailable && (
-        <BannerAlert
-          title={t('noOptionsAvailable')}
-          severity={BannerAlertSeverity.Danger}
-          description={
-            isSrcAmountLessThan30
-              ? t('noOptionsAvailableLessThan30Message')
-              : t('noOptionsAvailableMessage')
-          }
-          textAlign={TextAlign.Left}
-        />
-      )}
-    </Box>
+    </>
   );
 };
