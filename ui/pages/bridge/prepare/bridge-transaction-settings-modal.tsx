@@ -3,6 +3,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
   Box,
   Button,
+  ButtonPrimary,
+  ButtonPrimarySize,
   ButtonSize,
   ButtonVariant,
   Icon,
@@ -19,7 +21,10 @@ import {
 } from '../../../components/component-library';
 import { useI18nContext } from '../../../hooks/useI18nContext';
 import Tooltip from '../../../components/ui/tooltip';
-import { IconColor } from '../../../helpers/constants/design-system';
+import {
+  IconColor,
+  TextVariant,
+} from '../../../helpers/constants/design-system';
 import { getSlippage } from '../../../ducks/bridge/selectors';
 import { setSlippage } from '../../../ducks/bridge/actions';
 
@@ -121,7 +126,9 @@ export const BridgeTransactionSettingsModal = ({
           </Box>
         </Box>
         <ModalFooter>
-          <Button
+          <ButtonPrimary
+            size={ButtonPrimarySize.Md}
+            variant={TextVariant.bodyMd}
             disabled={(localSlippage || customSlippage) === slippage}
             onClick={() => {
               dispatch(setSlippage(localSlippage || customSlippage));
@@ -129,7 +136,7 @@ export const BridgeTransactionSettingsModal = ({
             }}
           >
             {t('update')}
-          </Button>
+          </ButtonPrimary>
         </ModalFooter>
       </ModalContent>
     </Modal>
