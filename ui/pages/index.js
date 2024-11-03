@@ -12,6 +12,7 @@ import {
 import { MetamaskNotificationsProvider } from '../contexts/metamask-notifications';
 import { CurrencyRateProvider } from '../contexts/currencyRate';
 import { TokenRatesProvider } from '../contexts/tokenRates';
+import { TokenDetectionProvider } from '../contexts/tokenDetection';
 import ErrorPage from './error';
 import Routes from './routes';
 
@@ -53,7 +54,9 @@ class Index extends PureComponent {
                     <CurrencyRateProvider>
                       <MetamaskNotificationsProvider>
                         <TokenRatesProvider>
-                          <Routes />
+                          <TokenDetectionProvider>
+                            <Routes />
+                          </TokenDetectionProvider>
                         </TokenRatesProvider>
                       </MetamaskNotificationsProvider>
                     </CurrencyRateProvider>
