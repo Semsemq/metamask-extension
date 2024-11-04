@@ -94,11 +94,9 @@ export default function NftsTab() {
     currentLocale,
   ]);
 
-  useEffect(() => {
-    if (!nftsLoading && !nftsStillFetchingIndication) {
-      endTrace({ name: TraceName.AccountOverviewNftsTab });
-    }
-  }, [nftsLoading, nftsStillFetchingIndication]);
+  if (!nftsLoading && !nftsStillFetchingIndication) {
+    endTrace({ name: TraceName.AccountOverviewNftsTab });
+  }
 
   if (!hasAnyNfts && nftsStillFetchingIndication) {
     return (

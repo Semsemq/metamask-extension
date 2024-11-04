@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect, useMemo } from 'react';
+import React, { ReactNode, useMemo } from 'react';
 import { shallowEqual, useSelector } from 'react-redux';
 import TokenCell from '../token-cell';
 import { useI18nContext } from '../../../../hooks/useI18nContext';
@@ -66,11 +66,9 @@ export default function TokenList({
     contractExchangeRates,
   ]);
 
-  useEffect(() => {
-    if (!loading) {
-      endTrace({ name: TraceName.AccountOverviewAssetListTab });
-    }
-  }, [loading]);
+  if (!loading) {
+    endTrace({ name: TraceName.AccountOverviewAssetListTab });
+  }
 
   return loading ? (
     <Box
