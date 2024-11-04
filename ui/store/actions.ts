@@ -4556,23 +4556,24 @@ export async function currencyRateStopPollingByPollingToken(
 }
 
 /**
- * Informs the TokenRatesController that the UI requires token rate polling
+ * Informs the TokenRatesController that the UI requires
+ * token rate polling for the given chain id.
  *
- * @param networkClientId
+ * @param chainId - The chain id to poll token rates on.
  * @returns polling token that can be used to stop polling
  */
-export async function tokenRatesStartPolling(
-  networkClientId: string,
-): Promise<string> {
+export async function tokenRatesStartPolling(chainId: string): Promise<string> {
   const pollingToken = await submitRequestToBackground(
     'tokenRatesStartPolling',
-    [{ networkClientId }],
+    [{ chainId }],
   );
-  // todo needed?
   await addPollingTokenToAppState(pollingToken);
   return pollingToken;
 }
+
 /**
+ * Informs the TokenRatesController that the UI no longer
+ * requires token rate polling for the given chain id.
  *
  * @param pollingToken -
  */
@@ -4582,7 +4583,6 @@ export async function tokenRatesStopPollingByPollingToken(
   await submitRequestToBackground('tokenRatesStopPollingByPollingToken', [
     pollingToken,
   ]);
-  // todo needed?
   await removePollingTokenFromAppState(pollingToken);
 }
 
