@@ -21,6 +21,7 @@ import { getCurrentCurrency } from '../../../selectors';
 import { getNativeCurrency } from '../../../ducks/metamask/metamask';
 import {
   AlignItems,
+  JustifyContent,
   TextAlign,
   TextColor,
   TextVariant,
@@ -130,20 +131,20 @@ export const BridgeQuoteCard = () => {
               </Text>
             </Row>
           </Column>
-          {isNoQuotesAvailable && (
-            <BannerAlert
-              title={t('noOptionsAvailable')}
-              severity={BannerAlertSeverity.Danger}
-              description={
-                isSrcAmountLessThan30
-                  ? t('noOptionsAvailableLessThan30Message')
-                  : t('noOptionsAvailableMessage')
-              }
-              textAlign={TextAlign.Left}
-            />
-          )}
         </Column>
       ) : null}
+      {isNoQuotesAvailable && (
+        <BannerAlert
+          title={t('noOptionsAvailable')}
+          severity={BannerAlertSeverity.Danger}
+          description={
+            isSrcAmountLessThan30
+              ? t('noOptionsAvailableLessThan30Message')
+              : t('noOptionsAvailableMessage')
+          }
+          textAlign={TextAlign.Left}
+        />
+      )}
     </>
   );
 };
