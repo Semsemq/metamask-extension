@@ -18,7 +18,7 @@ import { isProduction } from '../environment';
 // eslint-disable-next-line import/no-restricted-paths
 import { MultichainState } from '../../../ui/selectors/multichain';
 // eslint-disable-next-line import/no-restricted-paths
-import { NetworkState } from '../../../ui/selectors/networks';
+import { NetworkState } from './networks';
 
 type SmartTransactionsMetaMaskState = {
   metamask: {

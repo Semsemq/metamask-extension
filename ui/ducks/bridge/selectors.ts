@@ -12,12 +12,12 @@ import {
   // TODO: Remove restricted import
   // eslint-disable-next-line import/no-restricted-paths
 } from '../../../app/scripts/controllers/bridge/types';
-import { createDeepEqualSelector } from '../../selectors/util';
+import { createDeepEqualSelector } from '../../../shared/modules/selectors/util';
 import {
   NetworkState,
   getProviderConfig,
   getNetworkConfigurationsByChainId,
-} from '../../selectors/networks';
+} from '../../../shared/modules/selectors/networks';
 import { SwapsTokenObject } from '../../../shared/constants/swaps';
 import { BridgeState } from './bridge';
 
