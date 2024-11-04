@@ -52,7 +52,7 @@ export const BridgeQuoteCard = () => {
         <Column gap={3}>
           <Row alignItems={AlignItems.flexStart}>
             <Column textAlign={TextAlign.Left}>
-              <Row gap={1}>
+              <Row gap={1} justifyContent={JustifyContent.flexStart}>
                 <Text variant={TextVariant.bodyLgMedium}>{t('bestPrice')}</Text>
                 <Tooltip
                   title={t('howQuotesWork')}
@@ -73,7 +73,7 @@ export const BridgeQuoteCard = () => {
               </Text>
             </Column>
             {!isLoading && (
-              <SpacerBox>
+              <SpacerBox alignItems={AlignItems.flexEnd}>
                 <Text color={TextColor.textMuted}>
                   {secondsUntilNextRefresh}
                 </Text>
