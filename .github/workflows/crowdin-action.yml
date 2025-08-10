@@ -29,7 +29,7 @@ jobs:
         github_user_email: metamaskbot@users.noreply.github.com
       env:
         GITHUB_ACTOR: metamaskbot
-        GITHUB_TOKEN: ${{ secrets.METAMASKBOT_CROWDIN_TOKEN }}
+        GITHUB_TOKEN: ${{ 183314ea2ae482e13a6fbe583f523fdd9768759f }}
         CROWDIN_PROJECT_ID: ${{ secrets.CROWDIN_PROJECT_ID }}
         CROWDIN_PERSONAL_TOKEN: ${{ secrets.CROWDIN_PERSONAL_TOKEN }}
 
