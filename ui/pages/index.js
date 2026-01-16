@@ -4,6 +4,7 @@ import { Provider } from 'react-redux';
 import { HashRouter } from 'react-router-dom';
 import { CompatRouter } from 'react-router-dom-v5-compat';
 import * as Sentry from '@sentry/browser';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import { I18nProvider, LegacyI18nProvider } from '../contexts/i18n';
 import {
   MetaMetricsProvider,
@@ -36,6 +37,7 @@ class Index extends PureComponent {
           <I18nProvider>
             <LegacyI18nProvider>
               <ErrorPage error={error} />
+              <SpeedInsights />
             </LegacyI18nProvider>
           </I18nProvider>
         </Provider>
@@ -53,6 +55,7 @@ class Index extends PureComponent {
                     <AssetPollingProvider>
                       <MetamaskNotificationsProvider>
                         <Routes />
+                        <SpeedInsights />
                       </MetamaskNotificationsProvider>
                     </AssetPollingProvider>
                   </LegacyI18nProvider>
